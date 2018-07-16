@@ -1,0 +1,2 @@
+class KinesisException(Exception):
+    pass
