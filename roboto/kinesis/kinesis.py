@@ -1,7 +1,4 @@
-import time
-
 from boto3 import client
-from botocore.exceptions import ClientError
 
 from .models.responses import PutRecordResponse, StreamDescription, StreamSummary, StreamRecords
 from .exceptions import KinesisException
@@ -73,7 +70,6 @@ class KinesisStream(object):
         )
         records = StreamRecords(**records_response)
         return records
-
 
     def get_shard_iterator(self, shard_id, iter_type='LATEST', timestamp=None):
         """Retrieves shard iterator

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='roboto',
-    version="1.0.3",
+    version="1.0.4",
     summary="Readable, expressive, object-oriented approach to common Amazon Web Services",
     description="README.md",
     author="Brandon Blair",

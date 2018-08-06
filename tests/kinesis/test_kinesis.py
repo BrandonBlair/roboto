@@ -1,6 +1,4 @@
 import json
-import os
-import time
 
 from roboto.kinesis.models.responses import PutRecordResponse
 
@@ -10,8 +8,6 @@ class KinesisTests:
         mock_dict = {'test_key': 'test_value'}
         mock_data = json.dumps(mock_dict)
         mock_part_key = 'test'
-
-        epoch = int(time.time())
 
         put_resp = kinesis_stream.put_record(
             data=mock_data,
@@ -27,5 +23,3 @@ class KinesisTests:
         desired_shard = shard_ids[0]
         record_resp = kinesis_stream.get_records(shard_id=desired_shard)
         assert record_resp.records == []
-
-

@@ -24,7 +24,6 @@ class S3Bucket(object):
         put_resp = self.client.put_object(**kw)
         return S3PutResponse(**put_resp)
 
-
     def get_object(self, key):
         """Retrieve an object from the S3 bucket using its key"""
 
@@ -34,12 +33,13 @@ class S3Bucket(object):
         )
         return S3BucketObject(**object_data)
 
-    def list_objects(self, max_keys=100, start_after=''):
+    def list_objects(self, max_keys=100, prefix='', start_after=''):
         """List objects in an S3 bucket, limited by `max_keys`"""
 
         bucket_obj_map = self.client.list_objects_v2(
             Bucket=self.name,
             MaxKeys=max_keys,
+            Prefix=prefix,
             StartAfter=start_after
         )
         bucket_obj_list = S3BucketList(**bucket_obj_map)

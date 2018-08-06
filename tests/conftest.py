@@ -1,4 +1,3 @@
-from boto.kinesis import connect_to_region
 from moto import mock_kinesis, mock_s3
 
 from pytest import fixture
@@ -16,6 +15,7 @@ def kinesis_stream():
         kinesis.client.create_stream(StreamName=stream_name, ShardCount=2)
 
         yield kinesis
+
 
 @fixture(scope='function')
 def s3_bucket():
