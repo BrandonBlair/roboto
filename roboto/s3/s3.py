@@ -16,7 +16,7 @@ class S3Bucket(object):
 
     def _paginate(self, params):
         page_iterator = self.paginator.paginate(**params)
-        combined_results = [result['Contents'] for result in page_iterator]
+        combined_results = [result for result in page_iterator]
         return combined_results
 
     def put_object(self, bucket_name, key, body=None):
@@ -56,11 +56,17 @@ class S3Bucket(object):
         if not paginate:
             params['StartAfter'] = start_after
             bucket_obj_map = self.client.list_objects_v2(**params)
+            bucket_obj_list = S3BucketList(**bucket_obj_map)
+            bucket_contents = bucket_obj_list.contents
+
         else:
             bucket_obj_map = self._paginate(params)
+            list_of_bucket_obj_lists = [S3BucketList(**obj_data) for obj_data in bucket_obj_map]
+            bucket_contents = []
+            for bucket_obj_list in list_of_bucket_obj_lists:
+                bucket_contents += bucket_obj_list.contents
 
-        bucket_obj_list = S3BucketList(**bucket_obj_map)
-        return bucket_obj_list.contents
+        return bucket_contents
 
     @property
     def keys(self):
