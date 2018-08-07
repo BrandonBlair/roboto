@@ -3,6 +3,8 @@ from boto3 import client
 from .models.s3_bucket_object import S3BucketObject, S3BucketList
 from .models.s3_responses import S3PutResponse
 
+from .exceptions import S3Exception
+
 
 class S3Bucket(object):
     """AWS S3 Bucket represented as an object with customizable and readable methods"""
@@ -39,19 +41,25 @@ class S3Bucket(object):
         )
         return S3BucketObject(**object_data)
 
-    def list_objects(self, max_keys=100, prefix='', start_after=''):
+    def list_objects(self, max_keys=100, prefix='', start_after='', paginate=False):
         """List objects in an S3 bucket, limited by `max_keys`"""
+
+        if start_after and paginate:
+            raise S3Exception('Cannot paginate if using start_after parameter')
 
         params = {
             'Bucket': self.name,
             'MaxKeys': max_keys,
             'Prefix': prefix,
-            'StartAfter': start_after
         }
 
-        bucket_obj_map = self._paginate(params)
-        bucket_obj_list = S3BucketList(**bucket_obj_map)
+        if not paginate:
+            params['StartAfter'] = start_after
+            bucket_obj_map = self.client.list_objects_v2(**params)
+        else:
+            bucket_obj_map = self._paginate(params)
 
+        bucket_obj_list = S3BucketList(**bucket_obj_map)
         return bucket_obj_list.contents
 
     @property
