@@ -10,6 +10,12 @@ class S3Bucket(object):
     def __init__(self, name):
         self.name = name
         self.client = client('s3')
+        self.paginator = self.client.get_paginator('list_objects')
+
+    def _paginate(self, params):
+        page_iterator = self.paginator.paginate(**params)
+        combined_results = [result['Contents'] for result in page_iterator]
+        return combined_results
 
     def put_object(self, bucket_name, key, body=None):
         """Put an object into an S3 bucket"""
@@ -36,12 +42,14 @@ class S3Bucket(object):
     def list_objects(self, max_keys=100, prefix='', start_after=''):
         """List objects in an S3 bucket, limited by `max_keys`"""
 
-        bucket_obj_map = self.client.list_objects_v2(
-            Bucket=self.name,
-            MaxKeys=max_keys,
-            Prefix=prefix,
-            StartAfter=start_after
-        )
+        params = {
+            'Bucket': self.name,
+            'MaxKeys': max_keys,
+            'Prefix': prefix,
+            'StartAfter': start_after
+        }
+
+        bucket_obj_map = self._paginate(params)
         bucket_obj_list = S3BucketList(**bucket_obj_map)
 
         return bucket_obj_list.contents
